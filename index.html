@@ -201,105 +201,126 @@
     allow="autoplay"
   ></iframe>
 
-  <script>
-    const button1 = document.getElementById('replace-btn-1');
-    const button2 = document.getElementById('replace-btn-2');
-    const backButton = document.getElementById('back-to-canada-btn');
-    const canadaBox = document.getElementById('info-box-canada');
-    const athabascaBox = document.getElementById('info-box-athabasca');
-    const canadaBtn = document.getElementById('canada-btn');
-    const athabascaBtn = document.getElementById('athabasca-btn');
-    const container = document.getElementById('iframe-container');
-    const athabascaIframe = document.getElementById('athabasca-iframe');
+<script>
+  const button1 = document.getElementById('replace-btn-1');
+  const button2 = document.getElementById('replace-btn-2');
+  const backButton = document.getElementById('back-to-canada-btn');
+  const canadaBox = document.getElementById('info-box-canada');
+  const athabascaBox = document.getElementById('info-box-athabasca');
+  const canadaBtn = document.getElementById('canada-btn');
+  const athabascaBtn = document.getElementById('athabasca-btn');
+  const container = document.getElementById('iframe-container');
+  const athabascaIframe = document.getElementById('athabasca-iframe');
 
-    function replaceIframe1() {
-      container.innerHTML = `
-        <iframe
-          src="https://www.google.com/maps/d/u/0/embed?mid=1rvNqZRrnBWOHeSVipxVo2m5MeHFe60M&ehbc=2E312F&noprof=1"
-          frameborder="0"
-          style="overflow:hidden; height:100%; width:100%; position:absolute; top:0; left:0;"
-          height="100%"
-          width="100%">
-        </iframe>
-      `;
-      button1.style.display = 'none';
+  // --- SHOW CANADA ---
+  function replaceIframe1() {
+    container.innerHTML = `
+      <iframe
+        src="https://www.google.com/maps/d/u/0/embed?mid=1rvNqZRrnBWOHeSVipxVo2m5MeHFe60M&ehbc=2E312F&noprof=1"
+        frameborder="0"
+        style="overflow:hidden; height:100%; width:100%; position:absolute; top:0; left:0;"
+        height="100%"
+        width="100%">
+      </iframe>
+    `;
+    button1.style.display = 'none';
+    canadaBox.style.display = 'block';
+    setTimeout(() => canadaBox.classList.add('show'), 10); // fade-in
+    canadaBtn.style.display = 'block';
+    button2.style.display = 'block';
+  }
+
+  // --- SHOW ATHABASCA GLACIER ---
+  function replaceIframe2() {
+    // Fade out and hide Canada box
+    canadaBox.classList.remove('show');
+    canadaBox.classList.add('hide');
+    canadaBtn.style.display = 'none';
+
+    setTimeout(() => {
+      canadaBox.style.display = 'none';
+      canadaBox.classList.remove('hide');
+    }, 800);
+
+    // Load Athabasca map
+    container.innerHTML = `
+      <iframe
+        src="https://www.google.com/maps/d/u/0/embed?mid=1YghxOHSVOXb9_p0JEGl60ZG7E0_EYUQ&ehbc=2E312F&noprof=1"
+        frameborder="0"
+        style="overflow:hidden; height:100%; width:100%; position:absolute; top:0; left:0;"
+        height="100%"
+        width="100%">
+      </iframe>
+    `;
+
+    button2.style.display = 'none';
+
+    // Fade-in Athabasca info box and related UI
+    setTimeout(() => {
+      athabascaBox.style.display = 'block';
+      setTimeout(() => athabascaBox.classList.add('show'), 10);
+      athabascaBtn.style.display = 'block';
+      athabascaIframe.style.display = 'block';
+      backButton.style.display = 'block';
+    }, 900);
+  }
+
+  // --- GO BACK TO CANADA ---
+  function takeMeBack() {
+    // Hide Athabasca box & image
+    athabascaBox.classList.remove('show');
+    athabascaBox.classList.add('hide');
+    athabascaBtn.style.display = 'none';
+    athabascaIframe.style.display = 'none';
+    backButton.style.display = 'none';
+
+    setTimeout(() => {
+      athabascaBox.style.display = 'none';
+      athabascaBox.classList.remove('hide');
+    }, 800);
+
+    // Load Canada map
+    container.innerHTML = `
+      <iframe
+        src="https://www.google.com/maps/d/u/0/embed?mid=1rvNqZRrnBWOHeSVipxVo2m5MeHFe60M&ehbc=2E312F&noprof=1"
+        frameborder="0"
+        style="overflow:hidden; height:100%; width:100%; position:absolute; top:0; left:0;"
+        height="100%"
+        width="100%">
+      </iframe>
+    `;
+
+    // Show Canada box again
+    setTimeout(() => {
       canadaBox.style.display = 'block';
-      setTimeout(() => canadaBox.classList.add('show'), 10); // fade-in
+      setTimeout(() => canadaBox.classList.add('show'), 10);
       canadaBtn.style.display = 'block';
       button2.style.display = 'block';
-    }
+    }, 800);
+  }
 
-    function replaceIframe2() {
-      canadaBox.classList.remove('show');
-      canadaBox.classList.add('hide');
-      canadaBtn.style.display = 'none';
+  // --- Hide info box smoothly ---
+  function hideInfo(which) {
+    const box = which === 'canada' ? canadaBox : athabascaBox;
+    box.classList.remove('show');
+    box.classList.add('hide');
+    setTimeout(() => {
+      box.style.display = 'none';
+      box.classList.remove('hide');
+    }, 800);
+  }
 
-      setTimeout(() => {
-        canadaBox.style.display = 'none';
-        canadaBox.classList.remove('hide');
-      }, 800);
+  // --- Show info box smoothly (reusable for both boxes) ---
+  function showInfo(which) {
+    const box = which === 'canada' ? canadaBox : athabascaBox;
+    box.style.display = 'block';
+    setTimeout(() => box.classList.add('show'), 10);
+  }
+</script>
 
-      container.innerHTML = `
-        <iframe
-          src="https://www.google.com/maps/d/u/0/embed?mid=1YghxOHSVOXb9_p0JEGl60ZG7E0_EYUQ&ehbc=2E312F&noprof=1"
-          frameborder="0"
-          style="overflow:hidden; height:100%; width:100%; position:absolute; top:0; left:0;"
-          height="100%"
-          width="100%">
-        </iframe>
-      `;
-      button2.style.display = 'none';
-
-      setTimeout(() => {
-        athabascaBox.classList.add('show');
-        athabascaBtn.style.display = 'block';
-        athabascaIframe.style.display = 'block';
-        backButton.style.display = 'block';
-      }, 900);
-    }
-
-    function takeMeBack() {
-      athabascaBox.classList.remove('show');
-      athabascaBox.classList.add('hide');
-      athabascaBtn.style.display = 'none';
-      athabascaIframe.style.display = 'none';
-      backButton.style.display = 'none';
-
-      container.innerHTML = `
-        <iframe
-          src="https://www.google.com/maps/d/u/0/embed?mid=1rvNqZRrnBWOHeSVipxVo2m5MeHFe60M&ehbc=2E312F&noprof=1"
-          frameborder="0"
-          style="overflow:hidden; height:100%; width:100%; position:absolute; top:0; left:0;"
-          height="100%"
-          width="100%">
-        </iframe>
-      `;
-      setTimeout(() => {
-        canadaBox.style.display = 'block';
-        setTimeout(() => canadaBox.classList.add('show'), 10); // fade-in again
-        canadaBtn.style.display = 'block';
-        button2.style.display = 'block';
-      }, 800);
-    }
-
-    function hideInfo(which) {
-      const box = which === 'canada' ? canadaBox : athabascaBox;
-      box.classList.remove('show');
-      box.classList.add('hide');
-      setTimeout(() => {
-        box.style.display = 'none';
-        box.classList.remove('hide');
-      }, 800);
-    }
-
-    function showInfo(which) {
-      const box = which === 'canada' ? canadaBox : athabascaBox;
-      box.style.display = 'block';
-      setTimeout(() => box.classList.add('show'), 10);
-    }
-  </script>
 </body>
 </html>
+
 
 
 
