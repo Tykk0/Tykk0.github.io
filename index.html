@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>World Terrain Map</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+    #iframe-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Buttons shared style */
+    .map-btn {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      background-color: #FF7700;
+      color: white;
+      border: none;
+      padding: 4px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      transition: background-color 0.25s ease;
+    }
+    .map-btn:hover {
+      background-color: #8B4000;
+    }
+    #replace-btn-1,
+    #replace-btn-2,
+    #back-to-canada-btn {
+      top: 10px;
+    }
+    #replace-btn-2,
+    #back-to-canada-btn {
+      display: none;
+    }
+
+    /* Info boxes shared style */
+    .info-box {
+      position: absolute;
+      top: 20%;
+      right: 2%;
+      width: 30%;
+      max-width: 33%;
+      background: rgba(255, 255, 255, 0.75);
+      border: 10px solid #FF7700;
+      padding: 20px;
+      box-sizing: border-box;
+      z-index: 900;
+      opacity: 0;
+      display: none;
+      transition: opacity 0.8s ease;
+    }
+    .info-box.show {
+      display: block;
+      opacity: 1;
+    }
+    .info-box.hide {
+      opacity: 0;
+    }
+    .info-box h2 {
+      margin-top: 0;
+      font-size: 24px;
+    }
+    .info-box h3 {
+      font-size: 18px;
+      margin-bottom: 6px;
+      color: #8B4000;
+    }
+    .info-box p {
+      font-size: 16px;
+      line-height: 1.5;
+      margin-top: 0;
+    }
+
+    /* Close button */
+    .close-info {
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      background: none;
+      border: none;
+      font-size: 20px;
+      font-weight: bold;
+      color: #333;
+      cursor: pointer;
+    }
+    .close-info:hover {
+      color: #8B4000;
+    }
+
+    /* Corner toggle buttons */
+    .corner-btn {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
+      background-color: #FF7700;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      transition: background-color 0.25s ease;
+      display: none;
+    }
+    .corner-btn:hover {
+      background-color: #8B4000;
+    }
+
+    /* Overlaid iframe for Athabasca Glacier */
+    #athabasca-iframe {
+      position: absolute;
+      top: 20%;
+      left: 50px; /* Moved 20px from the right edge */
+      max-height: 90vh;
+      max-width: 33%; 
+      border: 10px solid #FF7700;
+      display: none;
+      z-index: 800;
+    }
+  </style>
+</head>
+<body>
+  <!-- Main Buttons -->
+  <button id="replace-btn-1" class="map-btn" onclick="replaceIframe1()">Show me Canada</button>
+  <button id="replace-btn-2" class="map-btn" onclick="replaceIframe2()">Show me Athabasca Glacier</button>
+  <button id="back-to-canada-btn" class="map-btn" onclick="takeMeBack()">Take me back to Canada</button>
+
+  <!-- Canada Info Box -->
+  <div id="info-box-canada" class="info-box">
+    <button class="close-info" onclick="hideInfo('canada')">×</button>
+    <h2>Canada</h2>
+    <p>
+      11 provinces, 3 territories. Athabasca glacier in province Alberta &amp; British Columbia.
+      High latitude, very cold. Approx. 80% uninhabited, 1,420,000 km² / 26% is tundra &amp; 65%
+      annual snow cover for more than 6 months of year. Country with 8th most glaciers &amp;
+      5th most percentage of land covered in glaciers, despite being the second largest country
+      in the world.
+    </p>
+  </div>
+
+  <!-- Athabasca Info Box -->
+  <div id="info-box-athabasca" class="info-box">
+    <button class="close-info" onclick="hideInfo('athabasca')">×</button>
+    <h2>Athabasca Glacier</h2>
+    <h3>Past facts</h3>
+    <p>
+      Losing depth at a rate of about 5 meters. Receded more than 1.5 km &amp; lost more than half its volume
+      in the past 125 years. Nowadays, it’s 6 km long, 6 sq km &amp; between 90 m and 300 m thick. It’s not
+      the only one — glaciers all around the world have lost an estimated 8000 cu km of ice. That can cover
+      nearly four-fifths of Europe’s land area with a sheet of ice a meter tall. Between melting glaciers &
+      many other things, climate change has been affecting our planet, which is why we must work to protect it.
+    </p>
+    <h3>Now facts</h3>
+    <p>
+      The most visited glacier in North America. Standard buses take people sightseeing. One of six glaciers
+      that spill down the Canadian Rockies from the Columbia Icefield. It is on the border of the Canadian
+      provinces of Alberta &amp; British Columbia.
+    </p>
+  </div>
+
+  <!-- Corner Toggle Buttons -->
+  <button id="canada-btn" class="corner-btn" onclick="showInfo('canada')">Canada</button>
+  <button id="athabasca-btn" class="corner-btn" onclick="showInfo('athabasca')">Athabasca Glacier</button>
+
+  <!-- Iframe container -->
+  <div id="iframe-container">
+    <iframe
+      src="https://www.google.com/maps/d/u/0/embed?mid=1UzX_dFCzDB6ZJOKqV90j-Aq4hN9I5Ts&ehbc=2E312F&noprof=1"
+      frameborder="0"
+      style="overflow:hidden; height:100%; width:100%; position:absolute; top:0; left:0;"
+      height="100%"
+      width="100%">
+    </iframe>
+  </div>
+
+  <!-- Overlaid Google Drive iframe -->
+  <iframe
+    id="athabasca-iframe"
+    src="https://drive.google.com/file/d/14aMC-c-vbY5gSyrLGBPz6tYMFFQ5cEza/preview"
+    width="640"
+    height="480"
+    allow="autoplay"
+  ></iframe>
+
+  <script>
+    const button1 = document.getElementById('replace-btn-1');
+    const button2 = document.getElementById('replace-btn-2');
+    const backButton = document.getElementById('back-to-canada-btn');
+    const canadaBox = document.getElementById('info-box-canada');
+    const athabascaBox = document.getElementById('info-box-athabasca');
+    const canadaBtn = document.getElementById('canada-btn');
+    const athabascaBtn = document.getElementById('athabasca-btn');
+    const container = document.getElementById('iframe-container');
+    const athabascaIframe = document.getElementById('athabasca-iframe');
+
+    function replaceIframe1() {
+      container.innerHTML = `
+        <iframe
+          src="https://www.google.com/maps/d/u/0/embed?mid=1rvNqZRrnBWOHeSVipxVo2m5MeHFe60M&ehbc=2E312F&noprof=1"
+          frameborder="0"
+          style="overflow:hidden; height:100%; width:100%; position:absolute; top:0; left:0;"
+          height="100%"
+          width="100%">
+        </iframe>
+      `;
+      button1.style.display = 'none';
+      canadaBox.style.display = 'block';
+      setTimeout(() => canadaBox.classList.add('show'), 10); // fade-in
+      canadaBtn.style.display = 'block';
+      button2.style.display = 'block';
+    }
+
+    function replaceIframe2() {
+      canadaBox.classList.remove('show');
+      canadaBox.classList.add('hide');
+      canadaBtn.style.display = 'none';
+
+      setTimeout(() => {
+        canadaBox.style.display = 'none';
+        canadaBox.classList.remove('hide');
+      }, 800);
+
+      container.innerHTML = `
+        <iframe
+          src="https://www.google.com/maps/d/u/0/embed?mid=1YghxOHSVOXb9_p0JEGl60ZG7E0_EYUQ&ehbc=2E312F&noprof=1"
+          frameborder="0"
+          style="overflow:hidden; height:100%; width:100%; position:absolute; top:0; left:0;"
+          height="100%"
+          width="100%">
+        </iframe>
+      `;
+      button2.style.display = 'none';
+
+      setTimeout(() => {
+        athabascaBox.classList.add('show');
+        athabascaBtn.style.display = 'block';
+        athabascaIframe.style.display = 'block';
+        backButton.style.display = 'block';
+      }, 900);
+    }
+
+    function takeMeBack() {
+      athabascaBox.classList.remove('show');
+      athabascaBox.classList.add('hide');
+      athabascaBtn.style.display = 'none';
+      athabascaIframe.style.display = 'none';
+      backButton.style.display = 'none';
+
+      container.innerHTML = `
+        <iframe
+          src="https://www.google.com/maps/d/u/0/embed?mid=1rvNqZRrnBWOHeSVipxVo2m5MeHFe60M&ehbc=2E312F&noprof=1"
+          frameborder="0"
+          style="overflow:hidden; height:100%; width:100%; position:absolute; top:0; left:0;"
+          height="100%"
+          width="100%">
+        </iframe>
+      `;
+      setTimeout(() => {
+        canadaBox.style.display = 'block';
+        setTimeout(() => canadaBox.classList.add('show'), 10); // fade-in again
+        canadaBtn.style.display = 'block';
+        button2.style.display = 'block';
+      }, 800);
+    }
+
+    function hideInfo(which) {
+      const box = which === 'canada' ? canadaBox : athabascaBox;
+      box.classList.remove('show');
+      box.classList.add('hide');
+      setTimeout(() => {
+        box.style.display = 'none';
+        box.classList.remove('hide');
+      }, 800);
+    }
+
+    function showInfo(which) {
+      const box = which === 'canada' ? canadaBox : athabascaBox;
+      box.style.display = 'block';
+      setTimeout(() => box.classList.add('show'), 10);
+    }
+  </script>
+</body>
+</html>
+
+
+
